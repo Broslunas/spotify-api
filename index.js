@@ -23,7 +23,7 @@ app.get('/login', (req, res) => {
 });
 
 // Ruta de callback para recibir el código y cambiarlo por un token
-app.get('/callback', async (req, res) => {
+app.get('/spotify/callback', async (req, res) => {
   const code = req.query.code || null;
   try {
     const response = await axios.post('https://accounts.spotify.com/api/token',
@@ -109,5 +109,5 @@ app.get('/top-artists', async (req, res) => {
 app.use(express.static('public'));
 
 app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+  console.log(`ONLINE: http://localhost:${port}`);
 });
