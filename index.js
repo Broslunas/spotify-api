@@ -11,7 +11,7 @@ const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 
 // Ruta para iniciar la autenticación
-app.get('/login', (req, res) => {
+app.get('/spotify/login', (req, res) => {
   const scope = 'user-read-private user-read-email user-top-read user-read-currently-playing';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
@@ -47,7 +47,7 @@ app.get('/spotify/callback', async (req, res) => {
 });
 
 // Ruta para obtener datos del perfil del usuario
-app.get('/profile', async (req, res) => {
+app.get('/spotify/profile', async (req, res) => {
   const access_token = req.query.access_token;
   try {
     const response = await axios.get('https://api.spotify.com/v1/me', {
@@ -60,7 +60,7 @@ app.get('/profile', async (req, res) => {
   }
 });
 
-app.get('/top-artists', async (req, res) => {
+app.get('/spotify/top-artists', async (req, res) => {
     const access_token = req.query.access_token;
     try {
       const response = await axios.get('https://api.spotify.com/v1/me/top/artists', {
@@ -73,7 +73,7 @@ app.get('/top-artists', async (req, res) => {
     }
   });
   
-  app.get('/top-tracks', async (req, res) => {
+  app.get('/spotify/top-tracks', async (req, res) => {
     const access_token = req.query.access_token;
     try {
       const response = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
@@ -86,7 +86,7 @@ app.get('/top-artists', async (req, res) => {
     }
   });
   
-  app.get('/currently-playing', async (req, res) => {
+  app.get('/spotify/currently-playing', async (req, res) => {
     const access_token = req.query.access_token;
     try {
       const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
