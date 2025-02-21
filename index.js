@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const querystring = require('querystring');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
@@ -10,8 +11,9 @@ const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 
+// Aplica CORS a todas las rutas
 app.use(cors({
-  origin: 'https://stats.broslunas.com'
+  origin: '*' // <-- Esto permite solicitudes desde cualquier dominio
 }));
 
 // Ruta para iniciar la autenticación
@@ -64,51 +66,53 @@ app.get('/spotify/profile', async (req, res) => {
   }
 });
 
+// Ruta para obtener los mejores artistas del usuario
 app.get('/spotify/top-artists', async (req, res) => {
-    const access_token = req.query.access_token;
-    try {
-      const response = await axios.get('https://api.spotify.com/v1/me/top/artists', {
-        headers: { 'Authorization': 'Bearer ' + access_token }
-      });
+  const access_token = req.query.access_token;
+  try {
+    const response = await axios.get('https://api.spotify.com/v1/me/top/artists', {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.send('Error al obtener artistas');
+  }
+});
+
+// Ruta para obtener las mejores canciones del usuario
+app.get('/spotify/top-tracks', async (req, res) => {
+  const access_token = req.query.access_token;
+  try {
+    const response = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.send('Error al obtener tracks');
+  }
+});
+
+// Ruta para obtener la canción que el usuario está escuchando actualmente
+app.get('/spotify/currently-playing', async (req, res) => {
+  const access_token = req.query.access_token;
+  try {
+    const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    // Si está reproduciendo algo, Spotify devuelve un 200 con los datos
+    // Si no, puede devolver 204 sin contenido
+    if (response.status === 200) {
       res.json(response.data);
-    } catch (error) {
-      console.error(error);
-      res.send('Error al obtener artistas');
-    }
-  });
-  
-  app.get('/spotify/top-tracks', async (req, res) => {
-    const access_token = req.query.access_token;
-    try {
-      const response = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
-        headers: { 'Authorization': 'Bearer ' + access_token }
-      });
-      res.json(response.data);
-    } catch (error) {
-      console.error(error);
-      res.send('Error al obtener tracks');
-    }
-  });
-  
-  app.get('/spotify/currently-playing', async (req, res) => {
-    const access_token = req.query.access_token;
-    try {
-      const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
-        headers: { 'Authorization': 'Bearer ' + access_token }
-      });
-      // Si está reproduciendo algo, Spotify devuelve un 200 con los datos
-      // Si no, puede devolver 204 sin contenido
-      if (response.status === 200) {
-        res.json(response.data);
-      } else {
-        res.json({ is_playing: false });
-      }
-    } catch (error) {
-      console.error(error);
+    } else {
       res.json({ is_playing: false });
     }
-  });
-  
+  } catch (error) {
+    console.error(error);
+    res.json({ is_playing: false });
+  }
+});
 
 app.use(express.static('public'));
 
