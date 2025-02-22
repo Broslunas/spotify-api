@@ -114,6 +114,20 @@ app.get('/spotify/currently-playing', async (req, res) => {
   }
 });
 
+app.get('/spotify/recently-played', async (req, res) => {
+  const access_token = req.query.access_token;
+  try {
+    const response = await axios.get('https://api.spotify.com/v1/me/player/recently-played', {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.send('Error al obtener las canciones recientemente reproducidas');
+  }
+});
+
+
 app.use(express.static('public'));
 
 app.listen(port, () => {
