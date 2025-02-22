@@ -70,7 +70,7 @@ app.get('/spotify/profile', async (req, res) => {
 app.get('/spotify/top-artists', async (req, res) => {
   const access_token = req.query.access_token;
   try {
-    const response = await axios.get('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50', {
+    const response = await axios.get('https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50', {
       headers: { 'Authorization': 'Bearer ' + access_token }
     });
     res.json(response.data);
@@ -84,7 +84,7 @@ app.get('/spotify/top-artists', async (req, res) => {
 app.get('/spotify/top-tracks', async (req, res) => {
   const access_token = req.query.access_token;
   try {
-    const response = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
+    const response = await axios.get('https://api.spotify.com/v1/me/top/trackstime_range=short_term&limit=50', {
       headers: { 'Authorization': 'Bearer ' + access_token }
     });
     res.json(response.data);
