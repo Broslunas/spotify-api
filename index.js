@@ -163,11 +163,12 @@ app.put('/spotify/pause', async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    console.error(error);
+    console.error('Spotify API error:', error.response ? error.response.data : error);
     res.status(error.response ? error.response.status : 500)
        .json({ error: 'Error al pausar la reproducción' });
   }
 });
+
 
 // Reanudar la reproducción
 app.put('/spotify/play', async (req, res) => {
