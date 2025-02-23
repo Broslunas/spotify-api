@@ -18,7 +18,7 @@ app.use(cors({
 
 // Ruta para iniciar la autenticación
 app.get('/spotify/login', (req, res) => {
-  const scope = 'user-read-private user-read-email user-top-read user-read-currently-playing user-read-recently-played';
+  const scope = 'user-read-private user-read-email user-top-read user-read-currently-playing user-read-recently-played user-read-playback-state user-modify-playback-state';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
