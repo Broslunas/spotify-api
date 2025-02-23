@@ -45,7 +45,7 @@ app.get('/spotify/callback', async (req, res) => {
       });
     const access_token = response.data.access_token;
     // Ahora redirigimos a la página principal con el token en la URL
-    res.redirect(`http://localhost:3000/spotify/recently-played?access_token=${access_token}`);
+    res.redirect(`https://stats.broslunas.com/?access_token=${access_token}`);
   } catch (error) {
     console.error(error);
     res.send('Error en el callback');
