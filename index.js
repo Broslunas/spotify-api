@@ -45,7 +45,7 @@ app.get('/spotify/callback', async (req, res) => {
       });
     const access_token = response.data.access_token;
     // Ahora redirigimos a la página principal con el token en la URL
-    res.redirect(`https://stats.broslunas.com/?access_token=${access_token}`);
+    res.redirect(`http://localhost:3000/spotify/recently-played?access_token=${access_token}`);
   } catch (error) {
     console.error(error);
     res.send('Error en el callback');
@@ -124,6 +124,165 @@ app.get('/spotify/recently-played', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.send('Error al obtener las canciones recientemente reproducidas');
+  }
+});
+
+// Función auxiliar para obtener el device_id del dispositivo activo
+async function getActiveDevice(access_token) {
+  try {
+    const response = await axios.get('https://api.spotify.com/v1/me/player/devices', {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    const devices = response.data.devices;
+    if (devices && devices.length) {
+      // Se busca el dispositivo activo
+      const active = devices.find(device => device.is_active);
+      return active ? active.id : devices[0].id; // Si no hay activo, se toma el primero
+    }
+    return null;
+  } catch (error) {
+    console.error('Error al obtener dispositivos:', error);
+    return null;
+  }
+}
+
+// Pausar la reproducción
+app.put('/spotify/pause', async (req, res) => {
+  const access_token = req.query.access_token;
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = 'https://api.spotify.com/v1/me/player/pause';
+  if (device_id) {
+    url += `?device_id=${device_id}`;
+  }
+  try {
+    await axios.put(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al pausar la reproducción' });
+  }
+});
+
+// Reanudar la reproducción
+app.put('/spotify/play', async (req, res) => {
+  const access_token = req.query.access_token;
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = 'https://api.spotify.com/v1/me/player/play';
+  if (device_id) {
+    url += `?device_id=${device_id}`;
+  }
+  try {
+    await axios.put(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al reanudar la reproducción' });
+  }
+});
+
+// Saltar a la siguiente canción
+app.post('/spotify/next', async (req, res) => {
+  const access_token = req.query.access_token;
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = 'https://api.spotify.com/v1/me/player/next';
+  if (device_id) {
+    url += `?device_id=${device_id}`;
+  }
+  try {
+    await axios.post(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al pasar a la siguiente canción' });
+  }
+});
+
+// Volver a la canción anterior
+app.post('/spotify/previous', async (req, res) => {
+  const access_token = req.query.access_token;
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = 'https://api.spotify.com/v1/me/player/previous';
+  if (device_id) {
+    url += `?device_id=${device_id}`;
+  }
+  try {
+    await axios.post(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al volver a la canción anterior' });
+  }
+});
+
+// Activar o desactivar el modo aleatorio (shuffle)
+app.put('/spotify/shuffle', async (req, res) => {
+  const access_token = req.query.access_token;
+  const state = req.query.state; // 'true' o 'false'
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = `https://api.spotify.com/v1/me/player/shuffle?state=${state}`;
+  if (device_id) {
+    url += `&device_id=${device_id}`;
+  }
+  try {
+    await axios.put(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al cambiar el estado aleatorio' });
+  }
+});
+
+// Establecer el modo de repetición (repeat)
+app.put('/spotify/repeat', async (req, res) => {
+  const access_token = req.query.access_token;
+  const state = req.query.state; // 'track', 'context' o 'off'
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = `https://api.spotify.com/v1/me/player/repeat?state=${state}`;
+  if (device_id) {
+    url += `&device_id=${device_id}`;
+  }
+  try {
+    await axios.put(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al establecer el modo de repetición' });
   }
 });
 
