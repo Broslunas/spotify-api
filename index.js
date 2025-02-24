@@ -13,8 +13,7 @@ const redirect_uri = process.env.REDIRECT_URI;
 
 // Aplica CORS a todas las rutas
 app.use(cors({
-  origin: 'https://stats.broslunas.com',
-  origin: 'http://127.0.0.1:5500/'
+  origin: '*',
 }));
 
 // Ruta para iniciar la autenticación
