@@ -12,9 +12,11 @@ const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 
 // Aplica CORS a todas las rutas
-app.use(cors({
+app.use(
+  cors({
   origin: '*',
-}));
+  })
+);
 
 // Ruta para iniciar la autenticación
 app.get('/spotify/login', (req, res) => {
