@@ -287,6 +287,29 @@ app.put('/spotify/repeat', async (req, res) => {
   }
 });
 
+// Ajustar el volumen
+app.put('/spotify/volume', async (req, res) => {
+  const access_token = req.query.access_token;
+  const volume = req.query.volume; // Valor entre 0 y 100
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = `https://api.spotify.com/v1/me/player/volume?volume_percent=${volume}`;
+  if (device_id) {
+    url += `&device_id=${device_id}`;
+  }
+  try {
+    await axios.put(url, null, {
+      headers: { 'Authorization': 'Bearer ' + access_token }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Spotify API error:', error.response ? error.response.data : error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al ajustar el volumen' });
+  }
+});
 
 app.use(express.static('public'));
 
