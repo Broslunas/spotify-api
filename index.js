@@ -288,6 +288,7 @@ app.put('/spotify/repeat', async (req, res) => {
 });
 
 // Ajustar el volumen
+// Ajustar el volumen
 app.put('/spotify/volume', async (req, res) => {
   const access_token = req.query.access_token;
   const volume = req.query.volume; // Valor entre 0 y 100
@@ -295,10 +296,10 @@ app.put('/spotify/volume', async (req, res) => {
   if (!device_id) {
     device_id = await getActiveDevice(access_token);
   }
-  let url = `https://api.spotify.com/v1/me/player/volume?volume_percent=${volume}`;
-  if (device_id) {
-    url += `&device_id=${device_id}`;
+  if (!device_id) {
+    return res.status(400).json({ error: 'No se encontró un dispositivo activo' });
   }
+  const url = `https://api.spotify.com/v1/me/player/volume?volume_percent=${volume}&device_id=${device_id}`;
   try {
     await axios.put(url, null, {
       headers: { 'Authorization': 'Bearer ' + access_token }
