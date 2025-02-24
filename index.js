@@ -13,7 +13,7 @@ const redirect_uri = process.env.REDIRECT_URI;
 
 // Aplica CORS a todas las rutas
 app.use(cors({
-  origin: '*' // <-- Esto permite solicitudes desde cualquier dominio
+  origin: 'https://stats.broslunas.com' // <-- Esto permite solicitudes desde cualquier dominio
 }));
 
 // Ruta para iniciar la autenticación
@@ -287,8 +287,6 @@ app.put('/spotify/repeat', async (req, res) => {
   }
 });
 
-// Ajustar el volumen
-// Ajustar el volumen
 app.put('/spotify/volume', async (req, res) => {
   const access_token = req.query.access_token;
   const volume = req.query.volume; // Valor entre 0 y 100
