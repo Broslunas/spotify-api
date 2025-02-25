@@ -10,9 +10,6 @@ const port = process.env.PORT || 3000;
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
-
 
 // Aplica CORS a todas las rutas
 app.use(
@@ -49,45 +46,11 @@ app.get('/spotify/callback', async (req, res) => {
         }
       });
     const access_token = response.data.access_token;
-    const refresh_token = response.data.refresh_token;
-    
-    // Almacenar el refresh_token en una cookie httpOnly (solo accesible desde el servidor)
-    res.cookie('refresh_token', refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // solo en HTTPS en producción
-      sameSite: 'strict'
-    });
-    
-    // Redirigir al cliente con el access_token (puedes almacenarlo también en cookie si lo prefieres)
+    // Ahora redirigimos a la página principal con el token en la URL
     res.redirect(`https://stats.broslunas.com/?access_token=${access_token}`);
   } catch (error) {
     console.error(error);
     res.send('Error en el callback');
-  }
-});
-
-app.get('/spotify/refresh-token', async (req, res) => {
-  const refresh_token = req.cookies.refresh_token;
-  if (!refresh_token) {
-    return res.status(400).json({ error: 'Refresh token no encontrado en cookies' });
-  }
-  try {
-    const response = await axios.post('https://accounts.spotify.com/api/token',
-      querystring.stringify({
-        grant_type: 'refresh_token',
-        refresh_token: refresh_token
-      }), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
-        }
-      });
-    const newAccessToken = response.data.access_token;
-    res.json({ access_token: newAccessToken });
-  } catch (error) {
-    console.error('Error al refrescar token:', error.response ? error.response.data : error);
-    res.status(error.response ? error.response.status : 500)
-       .json({ error: 'Error al refrescar token' });
   }
 });
 
