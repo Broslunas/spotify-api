@@ -20,7 +20,7 @@ app.use(
 
 // Ruta para iniciar la autenticación
 app.get('/spotify/login', (req, res) => {
-  const scope = 'user-read-private user-read-email user-top-read user-read-currently-playing user-read-recently-played user-read-playback-state user-modify-playback-state';
+  const scope = 'user-read-private user-read-email user-top-read user-read-currently-playing user-read-recently-played user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -289,7 +289,6 @@ app.put('/spotify/repeat', async (req, res) => {
   }
 });
 
-// Ruta para obtener las playlists del usuario
 app.get('/spotify/playlists', async (req, res) => {
   const access_token = req.query.access_token;
   try {
