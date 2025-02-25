@@ -302,6 +302,30 @@ app.get('/spotify/playlists', async (req, res) => {
   }
 });
 
+app.put('/spotify/play-playlist', async (req, res) => {
+  const access_token = req.query.access_token;
+  const context_uri = req.query.context_uri; // Debe tener el formato "spotify:playlist:<playlist_id>"
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = 'https://api.spotify.com/v1/me/player/play';
+  if (device_id) {
+    url += `?device_id=${device_id}`;
+  }
+  try {
+    // Se envía el contexto de reproducción para iniciar la playlist
+    await axios.put(url, { context_uri }, {
+      headers: { 'Authorization': 'Bearer ' + access_token, 'Content-Type': 'application/json' }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error al reproducir la playlist:', error.response ? error.response.data : error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al reproducir la playlist' });
+  }
+});
+
 app.use(express.static('public'));
 
 app.listen(port, () => {
