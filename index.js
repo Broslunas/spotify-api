@@ -289,26 +289,17 @@ app.put('/spotify/repeat', async (req, res) => {
   }
 });
 
-app.put('/spotify/volume', async (req, res) => {
+// Ruta para obtener las playlists del usuario
+app.get('/spotify/playlists', async (req, res) => {
   const access_token = req.query.access_token;
-  const volume = req.query.volume; // Valor entre 0 y 100
-  let device_id = req.query.device_id;
-  if (!device_id) {
-    device_id = await getActiveDevice(access_token);
-  }
-  if (!device_id) {
-    return res.status(400).json({ error: 'No se encontró un dispositivo activo' });
-  }
-  const url = `https://api.spotify.com/v1/me/player/volume?volume_percent=${volume}&device_id=${device_id}`;
   try {
-    await axios.put(url, null, {
+    const response = await axios.get('https://api.spotify.com/v1/me/playlists?limit=50', {
       headers: { 'Authorization': 'Bearer ' + access_token }
     });
-    res.json({ success: true });
+    res.json(response.data);
   } catch (error) {
-    console.error('Spotify API error:', error.response ? error.response.data : error);
-    res.status(error.response ? error.response.status : 500)
-       .json({ error: 'Error al ajustar el volumen' });
+    console.error('Error al obtener playlists:', error);
+    res.status(500).send('Error al obtener playlists');
   }
 });
 
