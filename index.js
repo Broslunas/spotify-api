@@ -326,6 +326,34 @@ app.put('/spotify/play-playlist', async (req, res) => {
   }
 });
 
+// Endpoint para reproducir una pista específica
+app.put('/spotify/play-track', async (req, res) => {
+  const access_token = req.query.access_token;
+  const track_uri = req.query.track_uri; // debe tener el formato "spotify:track:<track_id>"
+  let device_id = req.query.device_id;
+  if (!device_id) {
+    device_id = await getActiveDevice(access_token);
+  }
+  let url = 'https://api.spotify.com/v1/me/player/play';
+  if (device_id) {
+    url += `?device_id=${device_id}`;
+  }
+  try {
+    // Enviamos la URI de la pista en un array
+    await axios.put(url, { uris: [track_uri] }, {
+      headers: { 
+        'Authorization': 'Bearer ' + access_token, 
+        'Content-Type': 'application/json' 
+      }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error al reproducir la pista:', error.response ? error.response.data : error);
+    res.status(error.response ? error.response.status : 500)
+       .json({ error: 'Error al reproducir la pista' });
+  }
+});
+
 app.use(express.static('public'));
 
 app.listen(port, () => {
