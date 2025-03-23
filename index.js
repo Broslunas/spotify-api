@@ -11,14 +11,12 @@ const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 
-// Aplica CORS a todas las rutas
 app.use(
   cors({
   origin: '*',
   })
 );
 
-// Ruta para iniciar la autenticación
 app.get('/spotify/login', (req, res) => {
   const scope = 'user-read-private user-read-email user-top-read user-read-currently-playing user-read-recently-played user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative';
   res.redirect('https://accounts.spotify.com/authorize?' +
@@ -30,7 +28,6 @@ app.get('/spotify/login', (req, res) => {
     }));
 });
 
-// Ruta de callback para recibir el código y cambiarlo por un token
 app.get('/spotify/callback', async (req, res) => {
   const code = req.query.code || null;
   try {
@@ -46,7 +43,6 @@ app.get('/spotify/callback', async (req, res) => {
         }
       });
     const access_token = response.data.access_token;
-    // Ahora redirigimos a la página principal con el token en la URL
     res.redirect(`https://stats.broslunas.com/?access_token=${access_token}`);
   } catch (error) {
     console.error(error);
@@ -285,7 +281,7 @@ app.put('/spotify/repeat', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(error.response ? error.response.status : 500)
-       .json({ error: 'Error al establecer el modo de repetición' });
+      json({ error: 'Error al establecer el modo de repetición' });
   }
 });
 
@@ -304,7 +300,7 @@ app.get('/spotify/playlists', async (req, res) => {
 
 app.put('/spotify/play-playlist', async (req, res) => {
   const access_token = req.query.access_token;
-  const context_uri = req.query.context_uri; // Debe tener el formato "spotify:playlist:<playlist_id>"
+  const context_uri = req.query.context_uri;
   let device_id = req.query.device_id;
   if (!device_id) {
     device_id = await getActiveDevice(access_token);
